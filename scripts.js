@@ -125,7 +125,7 @@ const cart = {
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
  */
 function formatPrice(price) {
-  return price;
+  return price.toString();
   /* Útfæra */
 }
 
@@ -287,11 +287,36 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
-  /* Útfæra */
+  debugger;
+  const productIdAsString = prompt ('Auðkenni vöru sem á að bæta við körf:')
 
-  /* Hér ætti að nota `validateInteger` hjálparfall til að staðfesta gögn frá notanda */
+  if(!productIdAsString) {
+    console.error('verður að vera tala')
+
+    return;
+  }
+
+  const productId = Number.parseInt(productIdAsString);
   
-  /* Til að athuga hvort vara sé til í `cart` þarf að nota `cart.lines.find` */
+  console.log(productId)
+
+  const product = products.find((i) => i.id === productId)
+
+  if (!product) {
+    console.error('vara fannst ekki');
+    return;
+  }
+
+
+  let productInCart = cart.lines.find((i) => i.product.id == productId)
+
+  if (productInCart) {
+    productInCart.quantity += 1;
+  } else {
+    const newLine = {product, quantity: 1}
+    cart.lines.push(newLine)
+  }
+
 }
 
 /**
