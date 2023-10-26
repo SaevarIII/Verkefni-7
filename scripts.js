@@ -125,9 +125,15 @@ const cart = {
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
  */
 function formatPrice(price) {
-  return price.toString();
-  /* Útfæra */
+  const formatter = new Intl.NumberFormat('is-IS', {
+    style: 'currency',
+    currency: 'ISK',
+    minimumFractionDigits: 0,
+  });
+
+  return formatter.format(price);
 }
+
 
 /**
  * Athuga hvort `num` sé heiltala á bilinu `[min, max]`.
@@ -137,8 +143,12 @@ function formatPrice(price) {
  * @returns `true` ef `num` er heiltala á bilinu `[min, max]`, annars `false`.
  */
 function validateInteger(num, min = 0, max = Infinity) {
-  return min <= num && num <= max;
-  /* Útfæra */
+  if (Number.isInteger(num)) {
+    return min <= num && num <= max;
+  }
+
+  return false;
+  
 }
 
 /**
@@ -174,8 +184,27 @@ function formatProduct(product, quantity = undefined) {
  * @returns Streng sem inniheldur upplýsingar um körfu.
  */
 function cartInfo(cart) {
-  /* Útfæra */
+  let cartInfoString = '';
+
+  if (cart.lines.length === 0) {
+    cartInfoString = 'Karfan er tóm.';
+  } else {
+    let total = 0;
+
+    cart.lines.forEach((line) => {
+      const { product, quantity } = line;
+      const totalPriceForItem = product.price * quantity;
+
+      cartInfoString += `${product.name} — ${quantity}x${product.price} kr.\n`;
+      total += totalPriceForItem;
+    });
+
+    cartInfoString += `Samtals: ${total} kr.`;
+  }
+
+  return cartInfoString;
 }
+
 
 // --------------------------------------------------------
 // Föll fyrir forritið
@@ -267,8 +296,15 @@ function addProduct() {
  * @returns undefined
  */
 function showProducts() {
-  /* Útfæra */
-  /* Hér ætti að nota `formatPrice` hjálparfall */
+  if (products.length === 0) {
+    console.log('Engar vörur til');
+    return;
+  }
+
+  products.forEach((product) => {
+    const formattedPrice = formatPrice(product.price);
+    console.log(`#${product.id} ${product.name} — ${product.description} — ${formattedPrice}`);
+  });
 }
 
 /**
@@ -332,7 +368,21 @@ function addProductToCart() {
  * @returns undefined
  */
 function showCart() {
-  /* Útfæra */
+  let total = 0;
+
+  if (cart.lines.length === 0) {
+    console.log('Karfan er tóm.');
+  } else {
+    cart.lines.forEach((line) => {
+      const { product, quantity } = line;
+      const totalPriceForItem = product.price * quantity;
+
+      console.log(`${product.name} — ${quantity}x${product.price} kr.`);
+      total += totalPriceForItem;
+    });
+
+    console.log(`Samtals: ${total} kr.`);
+  }
 }
 
 /**
@@ -354,5 +404,31 @@ function showCart() {
  * @returns undefined
  */
 function checkout() {
-  /* Útfæra */
+  if (cart.lines.length === 0) {
+    console.log('Karfan er tóm.');
+    return;
+  }
+
+  const customerName = prompt('Sláðu inn nafn:');
+  const customerAddress = prompt('Sláðu inn heimilisfang:');
+
+  if (!customerName || !customerAddress) {
+    console.error('Vantat Nafn og heimilisfang');
+    return;
+  }
+
+  console.log(`Pöntun móttekin ${customerName}.`);
+  console.log(`Vörur verða sendar á ${customerAddress}.\n`);
+
+  let total = 0;
+
+  cart.lines.forEach((line) => {
+    const { product, quantity } = line;
+    const totalPriceForItem = product.price * quantity;
+
+    console.log(`${product.name} — ${quantity}x${product.price} kr.`);
+    total += totalPriceForItem;
+  });
+
+  console.log(`\nSamtals: ${total} kr.`);
 }
