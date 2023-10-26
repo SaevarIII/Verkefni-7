@@ -125,6 +125,7 @@ const cart = {
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
  */
 function formatPrice(price) {
+  return price;
   /* Útfæra */
 }
 
@@ -136,6 +137,7 @@ function formatPrice(price) {
  * @returns `true` ef `num` er heiltala á bilinu `[min, max]`, annars `false`.
  */
 function validateInteger(num, min = 0, max = Infinity) {
+  return min <= num && num <= max;
   /* Útfæra */
 }
 
@@ -151,7 +153,13 @@ function validateInteger(num, min = 0, max = Infinity) {
  * @returns Streng sem inniheldur upplýsingar um vöru og hugsanlega fjölda af henni.
  */
 function formatProduct(product, quantity = undefined) {
-  /* Útfæra */
+  if (quantity && quantity > 1) {
+    const total = formatPrice(quantity * product.price);
+    return`${product.title} - ${quantity}*${formatPrice(product.price)} samtals ${total}`;
+
+   }
+
+ return`${product.title} - ${product.price}`;
 }
 
 /**
@@ -239,6 +247,7 @@ function addProduct() {
     price,
   };
 
+  console.log(product)
   // Bætum vörunni aftast við fylkið okkar.
   products.push(product);
 
